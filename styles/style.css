@@ -1,0 +1,47 @@
+* { margin: 0; padding: 0;}
+
+body {
+    margin-top:30px;
+}
+
+#messageArea {
+    display:none;
+}
+
+body, html { height:100%; }
+canvas {
+   	padding: 0;
+	margin: auto;
+	display: block;
+	width: 800px;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+    /*top:450px;*/
+}
+/*#messageForm {
+    padding-top: 75vh;
+}*/
+
+#message {
+    width: 500px;
+}
+
+/** { margin: 0; padding: 0;}
+
+body, html { height:100%; }
+
+canvas {
+    position: absolute;
+    width: 100%;
+    height: 94%;
+}
+
+#messageForm {
+    padding-top: 95vh;
+}
+
+#message {
+    width: 800px;
+}*/
