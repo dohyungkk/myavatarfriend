@@ -1,4 +1,5 @@
 var socket = io.connect();
+var timeOut;
 
 $('#userForm').submit(function(e) {
     e.preventDefault();
@@ -54,6 +55,62 @@ socket.on('drawAvatar', function(userName, roomsIndex, firstSpotTaken, secondSpo
     ctx.drawImage(person, x, y, 80, 120);
     drawNameTag(ctx, x, y, userName);
 
+    //socket.emit('spotTakenToTrue', roomsIndex, spotTakenIndex);
+});
+
+socket.on('drawAvatarsAlreadyInRoom', function(userName, firstSpotTaken, secondSpotTaken, thirdSpotTaken,
+                                               firstSpotUserName, secondSpotUserName, thirdSpotUserName, roomsIndex) {
+    var spotTakenIndex;
+
+    var first_x = 170;
+    var first_y = 330;
+
+    var second_x = 420;
+    var second_y = 360;
+
+    var third_x = 640;
+    var third_y = 210;
+
+    var _firstSpotTaken = false;
+    var _secondSpotTaken = false;
+    var _thirdSpotTaken = false;
+
+    if (firstSpotTaken) {
+        ctx.drawImage(person, first_x, first_y, 80, 120);
+        drawNameTag(ctx, first_x, first_y, firstSpotUserName);
+        _firstSpotTaken = true;
+    }
+
+    if (secondSpotTaken) {
+        ctx.drawImage(person, second_x, second_y, 80, 120);
+        drawNameTag(ctx, second_x, second_y, secondSpotUserName);
+        _secondSpotTaken = true;
+    }
+
+     if (thirdSpotTaken) {
+        ctx.drawImage(person, third_x, third_y, 80, 120);
+        drawNameTag(ctx, third_x, third_y, thirdSpotUserName);
+        _thirdSpotTaken = true;
+     }
+
+    if (!_firstSpotTaken) {
+        ctx.drawImage(person, first_x, first_y, 80, 120);
+        drawNameTag(ctx, first_x, first_y, userName);
+        spotTakenIndex = 1;
+        //socket.emit('spotTakenToTrue', roomsIndex, spotTakenIndex);
+        //return;
+    } else if (!_secondSpotTaken) {
+        ctx.drawImage(person, second_x, second_y, 80, 120);
+        drawNameTag(ctx, second_x, second_y, userName);
+        spotTakenIndex = 2;
+        //socket.emit('spotTakenToTrue', roomsIndex, spotTakenIndex);
+        //return;
+    } else if (!_thirdSpotTaken) {
+        ctx.drawImage(person, third_x, third_y, 80, 120);
+        drawNameTag(ctx, third_x, third_y, userName);
+        spotTakenIndex = 3;
+        //socket.emit('spotTakenToTrue', roomsIndex, spotTakenIndex);
+    }
     socket.emit('spotTakenToTrue', roomsIndex, spotTakenIndex);
 });
 
@@ -84,16 +141,68 @@ socket.on('updatechat', function (username, data) {
     $('#conversation').append('<div><strong>' + username + '</strong>: ' + data + '</div>');
 });
 
-socket.on('receivecanvas', function(message) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(image, 0, 0);
-    ctx.drawImage(person, person_x, person_y, 80, 120);
-    draw_bubble(ctx, "#fff", person_x , person_y, 10, message);
-    /*var img = new Image();
-    img.src = stringcanvas;
+socket.on('drawChatBubble', function(message, userPosition) {
+    clearTimeout(timeOut);
 
-    ctx.drawImage(img, 0, 0);*/
+    var x;
+    var y;
+
+    if (userPosition == 1) {
+        x = 170;
+        y = 330;
+    } else if (userPosition == 2) {
+        x = 420;
+        y = 360;
+    } else {
+        x = 640;
+        y = 210;
+    }
+
+    ctx.clearRect(x - 147, y - 169, 260, 170);
+    ctx.drawImage(image, x - 147, y - 169, 260, 170, x - 147, y - 169, 260, 170);
+    draw_bubble(ctx, "#fff", x , y, 10, message);
+    clearChatBubble(x, y);
 });
+
+function clearChatBubble(x, y) {
+    timeOut = setTimeout(function() {
+                ctx.clearRect(x - 147, y - 169, 260, 170);
+                ctx.drawImage(image, x - 147, y - 169, 260, 170, x - 147, y - 169, 260, 170);
+              }, 5000);
+}
+
+socket.on('eraseAvatar', function(userPosition) {
+    var x;
+    var y;
+
+    if (userPosition == 1) {
+        x = 170;
+        y = 330;
+    } else if (userPosition == 2) {
+        x = 420;
+        y = 360;
+    } else {
+        x = 640;
+        y = 210;
+    }
+
+    ctx.clearRect(x - 147, y - 169, 277, 314);
+    ctx.drawImage(image, x - 147, y - 169, 277, 314, x - 147, y - 169, 277, 314);
+});
+
+function getMousePos(canvas, evt) {
+  var rect = canvas.getBoundingClientRect();
+   return {
+      x: evt.clientX - rect.left,
+      y: evt.clientY - rect.top
+   };
+}
+
+canvas.addEventListener('click', function(evt) {
+  var mousePos = getMousePos(canvas, evt);
+  var message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
+  console.log(message);
+}, false);
 
 socket.on('get users', function(data) {
     var html = '';
@@ -227,20 +336,13 @@ function send_message() {
     var message = document.getElementById('message').value;
 
     if (message.trim().length > 0) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(image, 0, 0);
-        ctx.drawImage(person, person_x, person_y, 80, 120);
-
-        draw_bubble(ctx, "#fff", person_x , person_y, 10, message);
-        socket.emit('updatecanvas', message);
+        //ctx.clearRect(0, 0, canvas.width, canvas.height);
+        //ctx.drawImage(image, 0, 0);
+        //ctx.drawImage(person, person_x, person_y, 80, 120);
+        //draw_bubble(ctx, "#fff", person_x , person_y, 10, message);
+        socket.emit('updateCanvas', message);
         socket.emit('sendchat', message);
         $('#message').val('');
-
-
-        socket.on('connect', function() {
-          //var sessionid = socket.socket.sessionid;
-            console.log(socket.socket.username);
-        });
     }
 }
 

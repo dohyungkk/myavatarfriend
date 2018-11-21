@@ -2,11 +2,8 @@
 <head>
     <title>IO Chat</title>
     <link rel="shortcut icon" href="">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="styles/style.css">
 </head>
@@ -24,26 +21,8 @@
                 </form>
             </div>
         </div>
-		
 
         <div id="messageArea" class="row">
-		<nav class="navbar navbar-expand-lg navbar-light bg-light">
-			<a class="navbar-brand" href="#">MyAvatarFriend</a>
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navbarNav">
-				<ul class="navbar-nav">
-				<li>
-					<a class="nav-link" data-toggle="modal" data-target="#displayRoom" href="#displayRoom">Room List</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="#createRoom" data-toggle="modal" data-target="#createRoom">Create a Room</a>
-				</li>
-				</li>
-				</ul>
-			</div>
-		</nav>
             <canvas id="myCanvas"></canvas>
             <div class="col-md-2" id="display">
                 <div class="well">
@@ -51,66 +30,32 @@
                     <ul class="list-group" id="users"></ul>
                 </div>
             </div>
-			
-			 <div class ="modal fade" id="displayRoom" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h3>Room List</h3>
-						</div>
-						<div class="modal-body">
-							<ul class="list-group" id="rooms"></ul>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button>
-						</div>
-					</div>
-                </div>
-            </div>
-			
-			<div class ="modal fade" id="createRoom" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h3>Create New Room</h3>
-						</div>
-						<div class="modal-body">
-							<div id="room creation"></div>
-								<h5>Enter room name:</h5>
-								<input class="form-control" id="roomname" style="width:200px;" />
-								</br>
-							<input type="button" id="roombutton" value="Create Room" class="btn btn-success" />
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button>
-						</div>
-					</div>
-                </div>
-            </div>
 
-			<!--
             <div class ="col-md-2" id="displayRoom">
                 <div class="well">
                     <h3>Rooms</h3>
                     <ul class="list-group" id="rooms"></ul>
-                    
+                    <!--
                     <h3>Room users</h3>
                     <ul class="list-group" id="roomusers"></ul>
-                    
+                    -->
                 </div>
             </div>
-				-->
             <br/>
 
+            <div id="room creation"></div>
+                    <label>Room Name:</label>
+                    <input id="roomname" style="width:200px;" />
+                    <input type="button" id="roombutton" value="Create Room" class="btn btn-success" />
+                    <br/>
+                    <br/>
+
+            <div>
                 <div class="chat" id="chat"></div>
                 <div id="messageForm">
                     <div class="form-group" id="conversation">
                         <label>Enter Message:</label>
-                        <input  class="form-control" id="message" type="text" maxlength="150">
+                        <input id="message" type="text" maxlength="150">
                         <!--
                         <button class="btn btn-success" onClick="send_message()" id="datasend">Send</button>
                         -->

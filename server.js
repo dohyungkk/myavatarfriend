@@ -32,7 +32,7 @@ io.sockets.on('connection', function (socket) {
 				var index;
 
 				if (rooms.length == 0) {
-						rooms.push(["Room" + roomCounter++, false, false, false]);
+						rooms.push(["Room" + roomCounter++, false, false, false, username, null, null]);
 						socket.join(rooms[rooms.length - 1][0]);
 						index = rooms.length - 1;
 						socket.broadcast.emit('updateRoomsForOthers', rooms[index][0]);
@@ -48,22 +48,36 @@ io.sockets.on('connection', function (socket) {
 						}
 
 						if (roomsAllFull) {
-								rooms.push(["Room" + roomCounter++, false, false, false]);
+								rooms.push(["Room" + roomCounter++, false, false, false, username, null, null]);
 								socket.join(rooms[rooms.length - 1][0]);
 								index = rooms.length - 1;
 								socket.broadcast.emit('updateRoomsForOthers', rooms[index][0]);
 						} else {
 								socket.join(rooms[i][0]);
 								index = i;
+								var j;
+								for (j = 4; j <= 6; j++) {
+										if (rooms[i][j] == null) {
+												rooms[i][j] = username;
+												break;
+										}
+								}
+
+								//Updates the canvas of every client except the sender in the room with a new avatar that joined the room
+								socket.to(rooms[index][0]).emit('drawAvatar', username, index, rooms[index][1], rooms[index][2], rooms[index][3]);
 						}
 				}
 				// store the room name in the socket session for this client
 				socket.room = rooms[index][0];
 
+				//store the index of the rooms array the client is in
+				socket.index = index;
+
 				//var numOfClients = io.sockets.adapter.rooms[rooms[index][0]];
 
-				//Updates the canvas of every client in the room with a new avatar that joined the room
-				io.in(rooms[index][0]).emit('drawAvatar', username, index, rooms[index][1], rooms[index][2], rooms[index][3]);
+				socket.emit('drawAvatarsAlreadyInRoom', username,
+				rooms[index][1], rooms[index][2], rooms[index][3],
+				rooms[index][4], rooms[index][5], rooms[index][6], index);
 
 				socket.emit('updaterooms', rooms, rooms[index][0]);
 
@@ -76,71 +90,67 @@ io.sockets.on('connection', function (socket) {
 
 	socket.on('spotTakenToTrue', function(roomsIndex, spotTakenIndex) {
 			rooms[roomsIndex][spotTakenIndex] = true;
+			socket.position = spotTakenIndex;
 	});
 
-	socket.on('updatecanvas', function(message) {
-			io.sockets.adapter.clients(["room1"], function(err, clients) {
-					if (clients.length <= 3) {
-							socket.to(socket.room).emit('receivecanvas', message);
-					}
-			})
-			//io.sockets.in(socket.room).emit('receivecanvas', message);
+	socket.on('updateCanvas', function(message) {
+			io.in(socket.room).emit('drawChatBubble', message, socket.position);
 	});
 
 	// when the client emits 'sendchat', this listens and executes
 	socket.on('sendchat', function (data) {
-		// we tell the client to execute 'updatechat' with 2 parameters
-		io.sockets.in(socket.room).emit('updatechat', socket.username, data);
+			// we tell the client to execute 'updatechat' with 2 parameters
+			io.sockets.in(socket.room).emit('updatechat', socket.username, data);
 	});
 
 	socket.on('switchRoom', function(newroom) {
-		// leave the current room (stored in session)
-		socket.leave(socket.room);
-		// join new room, received as function parameter
-		socket.join(newroom);
-		socket.emit('updatechat', 'SERVER', 'you have connected to '+ newroom);
-		// sent message to OLD room
-		socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username+' has left this room');
-		// update socket session room title
-		socket.room = newroom;
-		socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username+' has joined this room');
-		socket.emit('updaterooms', rooms, newroom);
+			// leave the current room (stored in session)
+			socket.leave(socket.room);
+			// join new room, received as function parameter
+			socket.join(newroom);
+			socket.emit('updatechat', 'SERVER', 'you have connected to '+ newroom);
+			// sent message to OLD room
+			socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has left this room');
+			// update socket session room title
+			socket.room = newroom;
+			socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username + ' has joined this room');
+			socket.emit('updaterooms', rooms, newroom);
 	});
 
 	socket.on('create', function(room) {
-       rooms.push(room);
-       io.emit('updaterooms', rooms, socket.room);
-   });
+      rooms.push(room);
+      io.emit('updaterooms', rooms, socket.room);
+  });
 
 	// when the user disconnects.. perform this
 	socket.on('disconnect', function() {
-		// remove the username from global usernames list
+			users.splice(users.indexOf(socket.username), 1);
+			updateUsernames();
+			connections.splice(connections.indexOf(socket), 1);
+			console.log('Disconnected: %s sockets connected', connections.length);
 
-		// update list of users in chat, client-side
+			// echo globally that this client has left
+			socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected');
+			//Erase this client's avatar on everyone elses' canvas
+			socket.to(socket.room).emit('eraseAvatar', socket.position);
 
-		// echo globally that this client has left
-		socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected');
-		socket.leave(socket.room);
+			rooms[socket.index][socket.position] = false;
+			rooms[socket.index][socket.position + 3] = null;
+
+			socket.leave(socket.room);
 	});
 
 	connections.push(socket);
 	console.log('Connected: %s sockets connected', connections.length);
 
-	socket.on('disconnect', function(data) {
-		users.splice(users.indexOf(socket.username), 1);
-		updateUsernames();
-		connections.splice(connections.indexOf(socket), 1);
-		console.log('Disconnected: %s sockets connected', connections.length);
-	});
-
 	socket.on('new user', function(data, callback) {
-		callback(true);
-		socket.username = data;
-		users.push(socket.username);
-		updateUsernames();
+			callback(true);
+			socket.username = data;
+			users.push(socket.username);
+			updateUsernames();
 	});
 
 	function updateUsernames(){
-		io.sockets.emit('get users', users);
+			io.sockets.emit('get users', users);
 	}
 });
