@@ -111,7 +111,7 @@ socket.on('drawAvatarsAlreadyInRoom', function(userName, firstSpotTaken, secondS
         spotTakenIndex = 3;
         //socket.emit('spotTakenToTrue', roomsIndex, spotTakenIndex);
     }
-    socket.emit('spotTakenToTrue', roomsIndex, spotTakenIndex);
+    socket.emit('spotTakenToTrue', roomsIndex, spotTakenIndex, userName);
 });
 
 function switchRoom(room) {
@@ -190,6 +190,11 @@ socket.on('eraseAvatar', function(userPosition) {
     ctx.drawImage(image, x - 147, y - 169, 277, 314, x - 147, y - 169, 277, 314);
 });
 
+socket.on('clearCanvas', function() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(image, 0, 0);
+});
+
 function getMousePos(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
    return {
@@ -212,8 +217,8 @@ socket.on('get users', function(data) {
     $('#users').html(html);
 });
 
-image.src = 'beach_chat_room.png';
-person.src = 'person.png';
+image.src = 'backgrounds/beachchat.png';
+person.src = 'avatars/17_year_old_girl.png';
 
 function draw_bubble(ctx, color, x, y, radius, text) {
     var text_length = text.length;

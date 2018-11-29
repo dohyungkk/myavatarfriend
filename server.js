@@ -88,8 +88,9 @@ io.sockets.on('connection', function (socket) {
 				socket.to(rooms[index][0]).emit('updatechat', 'SERVER', username + ' has connected to this room');
 	});
 
-	socket.on('spotTakenToTrue', function(roomsIndex, spotTakenIndex) {
+	socket.on('spotTakenToTrue', function(roomsIndex, spotTakenIndex, userName) {
 			rooms[roomsIndex][spotTakenIndex] = true;
+			rooms[roomsIndex][spotTakenIndex + 3] = userName;
 			socket.position = spotTakenIndex;
 	});
 
@@ -111,6 +112,26 @@ io.sockets.on('connection', function (socket) {
 			socket.emit('updatechat', 'SERVER', 'you have connected to '+ newroom);
 			// sent message to OLD room
 			socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has left this room');
+
+			//Erase this client's avatar on everyone elses' canvas
+			socket.to(socket.room).emit('eraseAvatar', socket.position);
+
+			//Erases the client's canvas and redraws only the background
+			socket.emit('clearCanvas');
+
+			rooms[socket.index][socket.position] = false;
+			rooms[socket.index][socket.position + 3] = null;
+
+			var roomIndex = getIndexOfRoom(newroom);
+			socket.index = roomIndex;
+
+			//Updates the canvas of every client except the sender in the room with a new avatar that joined the room
+			socket.to(rooms[roomIndex][0]).emit('drawAvatar', socket.username, roomIndex, rooms[roomIndex][1], rooms[roomIndex][2], rooms[roomIndex][3]);
+
+			socket.emit('drawAvatarsAlreadyInRoom', socket.username,
+			rooms[roomIndex][1], rooms[roomIndex][2], rooms[roomIndex][3],
+			rooms[roomIndex][4], rooms[roomIndex][5], rooms[roomIndex][6], roomIndex);
+
 			// update socket session room title
 			socket.room = newroom;
 			socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username + ' has joined this room');
@@ -137,7 +158,9 @@ io.sockets.on('connection', function (socket) {
 			rooms[socket.index][socket.position] = false;
 			rooms[socket.index][socket.position + 3] = null;
 
-			socket.leave(socket.room);
+			if (roomIsEmpty(socket.index)) {
+					rooms.splice(socket.index);
+			}
 	});
 
 	connections.push(socket);
@@ -154,3 +177,33 @@ io.sockets.on('connection', function (socket) {
 			io.sockets.emit('get users', users);
 	}
 });
+
+//Checks to see if all 3 usernames in the room are null and if they all are it returns true
+function roomIsEmpty(i) {
+		for (var j = 4; j <= 6; j++) {
+				if (rooms[i][j] != null) {
+						return false;
+				}
+		}
+
+		return true;
+}
+
+//Returns the index of the room name that matches the one passed in the argument
+function getIndexOfRoom(roomName) {
+		for (var i = 0; i < rooms.length; i++) {
+				if (rooms[i][0] == roomName) {
+						return i;
+				}
+		}
+}
+
+//Returns the smallest room number that is not being used for a room
+function getVacantRoomNumber() {
+		for (var i = 0; i < rooms.length; i++) {
+				var num = parseInt(rooms[i][0]);
+				if (num != (i + 1)) {
+						return (i + 1);
+				}
+		}
+}
