@@ -2,6 +2,8 @@
 
 body {
     margin-top:30px;
+	overflow: hidden;
+	background-image: url("../images/backgrounds/websiteBackground.jpg");
 }
 
 #messageArea {
@@ -10,8 +12,12 @@ body {
 
 body, html { height:100%; }
 canvas {
-    position: relative;
-    /*top:450px;*/
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 800px;
 }
 /*#messageForm {
     padding-top: 75vh;
@@ -19,6 +25,12 @@ canvas {
 
 #message {
     width: 500px;
+}
+
+label {
+    display: inline-block;
+    margin-bottom: .5rem;
+    margin-left: 60;
 }
 
 /** { margin: 0; padding: 0;}

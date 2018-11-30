@@ -32,12 +32,14 @@ io.sockets.on('connection', function (socket) {
 	socket.on('adduser', function(username) {
 				socket.username = username;
 				var index;
+				var numOfClients;
 
 				if (rooms.length == 0) {
 						rooms.push(["Room" + roomCounter++, false, false, false, username, null, null]);
 						socket.join(rooms[rooms.length - 1][0]);
 						index = rooms.length - 1;
-						socket.broadcast.emit('updateRoomsForOthers', rooms[index][0]);
+						numOfClients = io.sockets.adapter.rooms[rooms[index][0]].length;
+						socket.broadcast.emit('updateRoomsForOthers', rooms[index][0], numOfClients);
 				} else {
 						var roomsAllFull = true;
 						var i;
@@ -53,7 +55,8 @@ io.sockets.on('connection', function (socket) {
 								rooms.push(["Room" + roomCounter++, false, false, false, username, null, null]);
 								socket.join(rooms[rooms.length - 1][0]);
 								index = rooms.length - 1;
-								socket.broadcast.emit('updateRoomsForOthers', rooms[index][0]);
+								numOfClients = io.sockets.adapter.rooms[rooms[index][0]].length;
+								socket.broadcast.emit('updateRoomsForOthers', rooms[index][0], numOfClients);
 						} else {
 								socket.join(rooms[i][0]);
 								index = i;
@@ -80,8 +83,10 @@ io.sockets.on('connection', function (socket) {
 				socket.emit('drawAvatarsAlreadyInRoom', username,
 				rooms[index][1], rooms[index][2], rooms[index][3],
 				rooms[index][4], rooms[index][5], rooms[index][6], index);
+				
+				numOfClients = io.sockets.adapter.rooms[rooms[index][0]].length;
 
-				socket.emit('updaterooms', rooms, rooms[index][0]);
+				socket.emit('updaterooms', rooms, rooms[index][0], numOfClients);
 
 				// echo to client they've connected
 				socket.emit('updatechat', 'SERVER', 'you have connected to ' + rooms[index][0]);

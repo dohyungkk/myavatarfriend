@@ -119,21 +119,21 @@ function switchRoom(room) {
 }
 
 // listener, whenever the server emits 'updaterooms', this updates the room the client is in
-socket.on('updaterooms', function(rooms, current_room) {
+socket.on('updaterooms', function(rooms, current_room, numOfClients) {
     $('#rooms').empty();
     var i;
     for (i = 0; i < rooms.length; i++) {
         if (rooms[i][0] == current_room) {
-            $('#rooms').append('<div>' + rooms[i][0] + '</div>');
+            $('#rooms').append('<div>' + rooms[i][0] + "\t\t" + numOfClients + "/3" + '</div>');
         } else {
-            $('#rooms').append('<div><a href="#" onclick="switchRoom(\''+ rooms[i][0] +'\')">' + rooms[i][0] + '</a></div>');
+            $('#rooms').append('<div><a href="#" onclick="switchRoom(\''+ rooms[i][0] +'\')">' + rooms[i][0] + "\t\t" + numOfClients + "/3" + '</a></div>');
         }
     }
 });
 
 // listener, whenever the server emits 'updaterooms', this updates the room the client is in
-socket.on('updateRoomsForOthers', function(current_room) {
-    $('#rooms').append('<div><a href="#" onclick="switchRoom(\''+ current_room +'\')">' + current_room + '</a></div>');
+socket.on('updateRoomsForOthers', function(current_room, numOfClients) {
+    $('#rooms').append('<div><a href="#" onclick="switchRoom(\''+ current_room +'\')">' + current_room + "\t\t" + numOfClients + "/3" + '</a></div>');
 });
 
 // listener, whenever the server emits 'updatechat', this updates the chat body
@@ -334,7 +334,25 @@ function draw_bubble(ctx, color, x, y, radius, text) {
 function drawNameTag(ctx, x, y, name) {
     ctx.fillStyle = "#000";
     ctx.font = "bold 20px Arial";
-    ctx.fillText(name, x, y + 130);
+	var width = ctx.measureText(name).width;
+	var xWidth = x;
+	console.log("name length: " + width);
+	if (width < 2)	{
+		ctx.fillText(name, xWidth, y + 130);
+	} else if (width < 12) {
+		ctx.fillText(name, xWidth + 30, y + 130);
+	} else if (width < 13) {
+		ctx.fillText(name, xWidth + 25, y + 130);
+	} else if (width < 8) {
+		ctx.fillText(name, xWidth, y + 130);
+	} else if (width < 10) {
+		ctx.fillText(name, xWidth, y + 130);
+	} else if (width < 50) {
+		ctx.fillText(name, xWidth + 20, y + 130);
+	} else if (width > 50) {
+		ctx.fillText(name, xWidth + 2, y + 130);
+	} 
+	
 }
 
 function send_message() {
