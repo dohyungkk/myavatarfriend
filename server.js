@@ -1,7 +1,9 @@
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
-var io = require('socket.io')(http, {'pingInterval': 2000, 'pingTimeout': 5000}).listen(server);
+var io = require('socket.io').listen(server);
+io.set('heartbeat timeout', 4000);
+io.set('heartbeat interval', 2000);
 var path = require('path');
 
 app.get('/', function(req, res) {
