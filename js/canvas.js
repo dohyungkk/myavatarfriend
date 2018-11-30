@@ -1,5 +1,5 @@
 var socket = io.connect();
-var timeOut;
+//var timeOut;
 
 $('#userForm').submit(function(e) {
     e.preventDefault();
@@ -142,7 +142,7 @@ socket.on('updatechat', function (username, data) {
 });
 
 socket.on('drawChatBubble', function(message, userPosition) {
-    clearTimeout(timeOut);
+    //clearTimeout(timeOut);
 
     var x;
     var y;
@@ -339,15 +339,11 @@ function drawNameTag(ctx, x, y, name) {
 
 function send_message() {
     var message = document.getElementById('message').value;
-
     if (message.trim().length > 0) {
-        //ctx.clearRect(0, 0, canvas.width, canvas.height);
-        //ctx.drawImage(image, 0, 0);
-        //ctx.drawImage(person, person_x, person_y, 80, 120);
-        //draw_bubble(ctx, "#fff", person_x , person_y, 10, message);
         socket.emit('updateCanvas', message);
         socket.emit('sendchat', message);
         $('#message').val('');
+
     }
 }
 
