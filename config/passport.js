@@ -16,6 +16,7 @@ module.exports = function(passport) {
   connection.query("SELECT * FROM users WHERE id = ? ", [id],
    function(err, rows){
     done(err, rows[0]);
+    connection.end();
    });
  });
 
@@ -27,7 +28,7 @@ module.exports = function(passport) {
    passReqToCallback: true
   },
   function(req, username, password, done){
-   connection.query("SELECT * FROM users WHERE username = ? ", 
+   connection.query("SELECT * FROM users WHERE username = ? ",
    [username], function(err, rows){
     if(err)
      return done(err);
@@ -50,6 +51,7 @@ module.exports = function(passport) {
        return done(null, newUserMysql);
       });
     }
+    connection.end();
    });
   })
  );
@@ -73,6 +75,7 @@ module.exports = function(passport) {
      return done(null, false, req.flash('loginMessage', 'Wrong Password'));
 
     return done(null, rows[0]);
+    connection.end();
    });
   })
  );
