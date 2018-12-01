@@ -1,4 +1,8 @@
 var express = require('express');
+var session = require('express-session');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var morgan = require('morgan');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
@@ -7,7 +11,10 @@ io.set('heartbeat interval', 2000);
 var path = require('path');
 
 app.get('/', function(req, res) {
-	res.sendFile(__dirname + '/index.html');
+	// res.sendFile(__dirname + '/index.ejs');
+	 res.render('index.ejs');
+
+	//require('./app/routes.js')(express(), require('config/passport.js'));
 });
 
 app.use(express.static('js'));
@@ -17,6 +24,31 @@ app.use(express.static('images'));
 app.use('/styles', express.static('styles'));
 
 server.listen(process.env.PORT || 3000);
+
+var passport = require('passport');
+var flash = require('connect-flash');
+
+require('./config/passport')(passport);
+
+app.use(morgan('dev'));
+app.use(cookieParser());
+app.use(bodyParser.urlencoded({
+ extended: true
+}));
+
+//app.set('view engine', 'ejs');
+
+app.use(session({
+ secret: 'justasecret',
+ resave:true,
+ saveUninitialized: true
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
+
+require('./app/routes.js')(app, passport);
 
 console.log('Server running');
 
@@ -83,7 +115,7 @@ io.sockets.on('connection', function (socket) {
 				socket.emit('drawAvatarsAlreadyInRoom', username,
 				rooms[index][1], rooms[index][2], rooms[index][3],
 				rooms[index][4], rooms[index][5], rooms[index][6], index);
-				
+
 				numOfClients = io.sockets.adapter.rooms[rooms[index][0]].length;
 
 				socket.emit('updaterooms', rooms, rooms[index][0], numOfClients);
