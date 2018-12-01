@@ -3,6 +3,7 @@ var LocalStrategy = require("passport-local").Strategy;
 var mysql = require('mysql');
 var bcrypt = require('bcrypt-nodejs');
 var dbconfig = require('./database');
+//var pool = mysql.createPool(dbconfig);
 var connection = mysql.createConnection(dbconfig.connection);
 
 connection.query('USE ' + dbconfig.database);
@@ -16,7 +17,7 @@ module.exports = function(passport) {
   connection.query("SELECT * FROM users WHERE id = ? ", [id],
    function(err, rows){
     done(err, rows[0]);
-    connection.end();
+    //connection.end();
    });
  });
 
@@ -51,7 +52,7 @@ module.exports = function(passport) {
        return done(null, newUserMysql);
       });
     }
-    connection.end();
+    //connection.end();
    });
   })
  );
@@ -75,7 +76,7 @@ module.exports = function(passport) {
      return done(null, false, req.flash('loginMessage', 'Wrong Password'));
 
     return done(null, rows[0]);
-    connection.end();
+    //connection.end();
    });
   })
  );
