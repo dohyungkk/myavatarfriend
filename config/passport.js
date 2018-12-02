@@ -8,6 +8,10 @@ var connection = mysql.createConnection(dbconfig.connection);
 
 connection.query('USE ' + dbconfig.database);
 
+setInterval(function () {
+   connection.query('SELECT 1');
+}, 5000);
+
 module.exports = function(passport) {
  passport.serializeUser(function(user, done){
   done(null, user.id);
