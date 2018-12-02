@@ -1,5 +1,31 @@
 var socket = io.connect();
+
+var userName = document.getElementById('username');
+var gender = document.getElementById('gender');
+var birthDate = document.getElementById('birthdate');
 //var timeOut;
+/*var mysql = require('mysql');
+var dbconfig = require('./database');
+var connection = mysql.createConnection(dbconfig.connection);
+
+connection.query('USE ' + dbconfig.database);
+
+connection.connect(function(err) {
+    if (err) {
+        throw err;
+    }
+    connection.query("SELECT username FROM users WHERE id = ?", [id], function (err, result) {
+        if (err) {
+            throw err;
+        }
+
+        console.log(result);
+    });
+});*/
+
+console.log(userName.textContent);
+console.log(gender.textContent);
+console.log(birthDate.textContent);
 
 $('#userForm').submit(function(e) {
     e.preventDefault();
@@ -351,8 +377,8 @@ function drawNameTag(ctx, x, y, name) {
 		ctx.fillText(name, xWidth + 20, y + 130);
 	} else if (width > 50) {
 		ctx.fillText(name, xWidth + 2, y + 130);
-	} 
-	
+	}
+
 }
 
 function send_message() {

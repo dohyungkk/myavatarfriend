@@ -43,8 +43,12 @@ module.exports = function(app, passport) {
  })
 
  app.get('/canvas', function(req, res){
-  res.render('canvas.ejs', {message:req.flash('canvasMessage')});
+  res.render('canvas.ejs', {
+    user:req.user
+  });
  });
+
+
 };
 
 function isLoggedIn(req, res, next){
