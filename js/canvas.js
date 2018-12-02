@@ -1,46 +1,13 @@
 var socket = io.connect();
 
-var n2 = document.getElementById('username');
+var userName = document.getElementById('username');
 var gender = document.getElementById('gender');
 var birthDate = document.getElementById('birthdate');
-//var timeOut;
-/*var mysql = require('mysql');
-var dbconfig = require('./database');
-var connection = mysql.createConnection(dbconfig.connection);
+var timeOut;
 
-connection.query('USE ' + dbconfig.database);
-
-connection.connect(function(err) {
-    if (err) {
-        throw err;
-    }
-    connection.query("SELECT username FROM users WHERE id = ?", [id], function (err, result) {
-        if (err) {
-            throw err;
-        }
-
-        console.log(result);
-    });
-});*/
-
-console.log(n2.textContent);
+console.log(userName.textContent);
 console.log(gender.textContent);
 console.log(birthDate.textContent);
-
-$('#userForm').submit(function(e) {
-    e.preventDefault();
-    // on connection to server, ask for user's name with an anonymous callback
-    //var sessionID = socket.socket.sessionid;
-    socket.emit('adduser', $('#username').val());
-    // call the server-side function 'adduser' and send one parameter (value of prompt)
-    socket.emit('new user', $('#username').val(), function(data) {
-        if (data) {
-            $('#userFormArea').hide();
-            $('#messageArea').show();
-        }
-    });
-    $('#username').val('');
-});
 
 // on load of page
 var canvas = document.getElementById('myCanvas');
@@ -57,6 +24,8 @@ window.onload = function () {
     canvas.width = image.naturalWidth;
     canvas.height = image.naturalHeight;
     ctx.drawImage(image, 0, 0);
+    socket.emit('adduser', userName.textContent);
+    socket.emit('new user', userName.textContent);
 }
 
 socket.on('drawAvatar', function(userName, roomsIndex, firstSpotTaken, secondSpotTaken, thirdSpotTaken) {

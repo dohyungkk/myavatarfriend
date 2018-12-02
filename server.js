@@ -205,9 +205,8 @@ io.sockets.on('connection', function (socket) {
 	connections.push(socket);
 	console.log('Connected: %s sockets connected', connections.length);
 
-	socket.on('new user', function(data, callback) {
-			callback(true);
-			socket.username = data;
+	socket.on('new user', function(username) {
+			socket.username = username;
 			users.push(socket.username);
 			updateUsernames();
 	});
