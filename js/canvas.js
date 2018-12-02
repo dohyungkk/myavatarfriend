@@ -1,6 +1,6 @@
 var socket = io.connect();
 
-var userName = document.getElementById('username');
+var n2 = document.getElementById('username');
 var gender = document.getElementById('gender');
 var birthDate = document.getElementById('birthdate');
 //var timeOut;
@@ -23,7 +23,7 @@ connection.connect(function(err) {
     });
 });*/
 
-console.log(userName.textContent);
+console.log(n2.textContent);
 console.log(gender.textContent);
 console.log(birthDate.textContent);
 
