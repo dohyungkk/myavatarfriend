@@ -11,10 +11,7 @@ io.set('heartbeat interval', 2000);
 var path = require('path');
 
 app.get('/', function(req, res) {
-	// res.sendFile(__dirname + '/index.ejs');
 	 res.render('index.ejs');
-
-	//require('./app/routes.js')(express(), require('config/passport.js'));
 });
 
 app.use(express.static('js'));
@@ -59,15 +56,55 @@ var rooms = [];
 var roomCounter = 1;
 var customRooms = [];
 
+function setAvatar(gender, age) {
+    if (age <= 7 && gender == 1) {
+				return 'avatars/7_year_old_solo_boy.png';
+    } else if (age <= 13 && gender == 1) {
+				return 'avatars/13_year_old_solo_boy.png';
+    } else if (gender == 1) {
+				return 'avatars/17_year_old_solo_boy.png';
+    }
+
+    if (age <= 7 && gender == 0) {
+				return 'avatars/7_year_old_solo_girl.png';
+    } else if (age <= 13 && gender == 0) {
+				return 'avatars/13_year_old_solo_girl.png';
+    } else if (gender == 0) {
+				return 'avatars/17_year_old_solo_girl.png';
+    }
+}
+
+function setBackground(gender, age) {
+    if (age <= 7 && gender == 1) {
+        return 'backgrounds/junglechat.png';
+    } else if (age <= 13 && gender == 1) {
+        return 'backgrounds/chesschat.png';
+    } else if (gender == 1) {
+        return 'backgrounds/soccerchat.png';
+    }
+
+    if (age <= 7 && gender == 0) {
+        return 'backgrounds/beachchat.png';
+    } else if (age <= 13 && gender == 0) {
+        return 'backgrounds/librarychat.png';
+    } else if (gender == 0) {
+        return 'backgrounds/carnivalchat.png';
+    }
+}
+
 io.sockets.on('connection', function (socket) {
 	// when the client emits 'adduser', this listens and executes
-	socket.on('adduser', function(username) {
+	socket.on('adduser', function(username, gender, age) {
 				socket.username = username;
+				socket.gender = gender;
+				socket.age = age;
+
 				var index;
 				var numOfClients;
 
 				if (rooms.length == 0) {
-						rooms.push(["Room" + roomCounter++, false, false, false, username, null, null]);
+						rooms.push(["Room" + roomCounter++, false, false, false,
+						 						username, null, null, setAvatar(gender, age), null, null, setBackground(gender, age)]);
 						socket.join(rooms[rooms.length - 1][0]);
 						index = rooms.length - 1;
 						numOfClients = io.sockets.adapter.rooms[rooms[index][0]].length;
@@ -84,7 +121,8 @@ io.sockets.on('connection', function (socket) {
 						}
 
 						if (roomsAllFull) {
-								rooms.push(["Room" + roomCounter++, false, false, false, username, null, null]);
+								rooms.push(["Room" + roomCounter++, false, false, false,
+												    username, null, null, setAvatar(gender, age), null, null, setBackground(gender, age)]);
 								socket.join(rooms[rooms.length - 1][0]);
 								index = rooms.length - 1;
 								numOfClients = io.sockets.adapter.rooms[rooms[index][0]].length;
@@ -96,12 +134,14 @@ io.sockets.on('connection', function (socket) {
 								for (j = 4; j <= 6; j++) {
 										if (rooms[i][j] == null) {
 												rooms[i][j] = username;
+												rooms[i][j + 3] = setAvatar(gender, age);
 												break;
 										}
 								}
 
 								//Updates the canvas of every client except the sender in the room with a new avatar that joined the room
-								socket.to(rooms[index][0]).emit('drawAvatar', username, index, rooms[index][1], rooms[index][2], rooms[index][3]);
+								socket.to(rooms[index][0]).emit('drawAvatar', username, index, rooms[index][1],
+												  rooms[index][2], rooms[index][3], setAvatar(gender, age));
 						}
 				}
 				// store the room name in the socket session for this client
@@ -114,7 +154,9 @@ io.sockets.on('connection', function (socket) {
 
 				socket.emit('drawAvatarsAlreadyInRoom', username,
 				rooms[index][1], rooms[index][2], rooms[index][3],
-				rooms[index][4], rooms[index][5], rooms[index][6], index);
+				rooms[index][4], rooms[index][5], rooms[index][6],
+				rooms[index][7], rooms[index][8], rooms[index][9],
+				setAvatar(gender, age), setBackground(gender, age), index);
 
 				numOfClients = io.sockets.adapter.rooms[rooms[index][0]].length;
 
@@ -127,9 +169,10 @@ io.sockets.on('connection', function (socket) {
 				socket.to(rooms[index][0]).emit('updatechat', 'SERVER', username + ' has connected to this room');
 	});
 
-	socket.on('spotTakenToTrue', function(roomsIndex, spotTakenIndex, userName) {
+	socket.on('spotTakenToTrue', function(roomsIndex, spotTakenIndex, userName, avatarType) {
 			rooms[roomsIndex][spotTakenIndex] = true;
 			rooms[roomsIndex][spotTakenIndex + 3] = userName;
+			rooms[roomsIndex][spotTakenIndex + 6] = avatarType;
 			socket.position = spotTakenIndex;
 	});
 
@@ -144,37 +187,43 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	socket.on('switchRoom', function(newroom) {
-			// leave the current room (stored in session)
-			socket.leave(socket.room);
-			// join new room, received as function parameter
-			socket.join(newroom);
-			socket.emit('updatechat', 'SERVER', 'you have connected to '+ newroom);
-			// sent message to OLD room
-			socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has left this room');
+			var room = io.sockets.adapter.rooms[rooms[getIndexOfRoom(newroom)][0]];
 
-			//Erase this client's avatar on everyone elses' canvas
-			socket.to(socket.room).emit('eraseAvatar', socket.position);
+			if (room.length == 3) {
+					socket.emit('roomIsFull');
+			} else {
+				// leave the current room (stored in session)
+				socket.leave(socket.room);
+				// join new room, received as function parameter
+				socket.join(newroom);
+				socket.emit('updatechat', 'SERVER', 'you have connected to '+ newroom);
+				// sent message to OLD room
+				socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has left this room');
 
-			//Erases the client's canvas and redraws only the background
-			socket.emit('clearCanvas');
+				//Erase this client's avatar on everyone elses' canvas
+				socket.to(socket.room).emit('eraseAvatar', socket.position);
 
-			rooms[socket.index][socket.position] = false;
-			rooms[socket.index][socket.position + 3] = null;
+				//Erases the client's canvas and redraws only the background
+				socket.emit('clearCanvas');
 
-			var roomIndex = getIndexOfRoom(newroom);
-			socket.index = roomIndex;
+				rooms[socket.index][socket.position] = false;
+				rooms[socket.index][socket.position + 3] = null;
 
-			//Updates the canvas of every client except the sender in the room with a new avatar that joined the room
-			socket.to(rooms[roomIndex][0]).emit('drawAvatar', socket.username, roomIndex, rooms[roomIndex][1], rooms[roomIndex][2], rooms[roomIndex][3]);
+				var roomIndex = getIndexOfRoom(newroom);
+				socket.index = roomIndex;
 
-			socket.emit('drawAvatarsAlreadyInRoom', socket.username,
-			rooms[roomIndex][1], rooms[roomIndex][2], rooms[roomIndex][3],
-			rooms[roomIndex][4], rooms[roomIndex][5], rooms[roomIndex][6], roomIndex);
+				//Updates the canvas of every client except the sender in the room with a new avatar that joined the room
+				socket.to(rooms[roomIndex][0]).emit('drawAvatar', socket.username, roomIndex, rooms[roomIndex][1], rooms[roomIndex][2], rooms[roomIndex][3]);
 
-			// update socket session room title
-			socket.room = newroom;
-			socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username + ' has joined this room');
-			socket.emit('updaterooms', rooms, newroom);
+				socket.emit('drawAvatarsAlreadyInRoom', socket.username,
+				rooms[roomIndex][1], rooms[roomIndex][2], rooms[roomIndex][3],
+				rooms[roomIndex][4], rooms[roomIndex][5], rooms[roomIndex][6], roomIndex);
+
+				// update socket session room title
+				socket.room = newroom;
+				socket.broadcast.to(newroom).emit('updatechat', 'SERVER', socket.username + ' has joined this room');
+				socket.emit('updaterooms', rooms, newroom);
+			}
 	});
 
 	socket.on('create', function(room) {
