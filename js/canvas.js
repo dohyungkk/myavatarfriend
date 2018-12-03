@@ -13,7 +13,7 @@ ctx.translate(0.5, 0.5);
 var background = new Image();
 var avatar = new Image();
 
-window.onload = function () {
+window.onload = function() {
     canvas.width = background.naturalWidth;
     canvas.height = background.naturalHeight;
     ctx.drawImage(background, 0, 0);
@@ -26,6 +26,9 @@ socket.on('drawAvatar', function(userName, roomsIndex, firstSpotTaken, secondSpo
     var y;
     var spotTakenIndex;
     var avatar = new Image();
+	  avatar.onload = function() {
+		    ctx.drawImage(avatar, x, y, 80, 120);
+	  }
 
     if (!firstSpotTaken) {
         x = 170;
@@ -41,9 +44,7 @@ socket.on('drawAvatar', function(userName, roomsIndex, firstSpotTaken, secondSpo
         spotTakenIndex = 3;
     }
 
-    avatar.src = avatarType;
-
-    ctx.drawImage(avatar, x, y, 80, 120);
+	  avatar.src = avatarType;
     drawNameTag(ctx, x, y, userName);
 });
 
@@ -51,7 +52,6 @@ socket.on('drawAvatarsAlreadyInRoom', function(userName, firstSpotTaken, secondS
                                                firstSpotUserName, secondSpotUserName, thirdSpotUserName,
                                                firstSpotAvatarType, secondSpotAvatarType, thirdSpotAvatarType,
                                                avatarType, backgroundType, roomsIndex) {
-    backgroundSrc = backgroundType;
     var spotTakenIndex;
 
     var first_x = 170;
@@ -67,47 +67,74 @@ socket.on('drawAvatarsAlreadyInRoom', function(userName, firstSpotTaken, secondS
     var _secondSpotTaken = false;
     var _thirdSpotTaken = false;
 
-    if (firstSpotTaken) {
-        ctx.drawImage(avatar, first_x, first_y, 80, 120);
-        avatar.src = firstSpotAvatarType;
+	var firstAvatar = new Image();
+	var secondAvatar = new Image();
+	var thirdAvatar = new Image();
+	var background = new Image();
 
+	background.onload = function() {
+		canvas.width = background.naturalWidth;
+		canvas.height = background.naturalHeight;
+		ctx.drawImage(background, 0, 0);
+	}
+	background.src = backgroundType;
+
+
+	firstAvatar.onload = function () {
+		ctx.drawImage(firstAvatar, first_x, first_y, 80, 120);
+	}
+
+	secondAvatar.onload = function () {
+		ctx.drawImage(secondAvatar, second_x, second_y, 80, 120);
+
+	}
+
+	thirdAvatar.onload = function () {
+		ctx.drawImage(thirdAvatar, third_x, third_y, 80, 120);
+
+	}
+
+    if (firstSpotTaken) {
         drawNameTag(ctx, first_x, first_y, firstSpotUserName);
         _firstSpotTaken = true;
+		console.log("hello");
+		firstAvatar.src = firstSpotAvatarType;
     }
 
     if (secondSpotTaken) {
-        avatar.src = secondSpotAvatarType;
-        ctx.drawImage(avatar, second_x, second_y, 80, 120);
         drawNameTag(ctx, second_x, second_y, secondSpotUserName);
         _secondSpotTaken = true;
+		//ctx.drawImage(avatar, second_x, second_y, 80, 120);
+		secondAvatar.src = secondSpotAvatarType;
     }
 
      if (thirdSpotTaken) {
-        avatar.src = thirdSpotAvatarType;
-        ctx.drawImage(avatar, third_x, third_y, 80, 120);
+        //ctx.drawImage(avatar, third_x, third_y, 80, 120);
         drawNameTag(ctx, third_x, third_y, thirdSpotUserName);
         _thirdSpotTaken = true;
+		avatar.src = thirdSpotAvatarType;
      }
 
     if (!_firstSpotTaken) {
-        avatar.src = avatarType;
-        ctx.drawImage(avatar, first_x, first_y, 80, 120);
+        //avatar.src = avatarType;
         drawNameTag(ctx, first_x, first_y, userName);
         spotTakenIndex = 1;
+		firstAvatar.src = avatarType;
     } else if (!_secondSpotTaken) {
-        avatar.src = avatarType;
-        ctx.drawImage(avatar, second_x, second_y, 80, 120);
         drawNameTag(ctx, second_x, second_y, userName);
         spotTakenIndex = 2;
+		secondAvatar.src = avatarType;
     } else if (!_thirdSpotTaken) {
-        avatar.src = avatarType;
-        ctx.drawImage(avatar, third_x, third_y, 80, 120);
         drawNameTag(ctx, third_x, third_y, userName);
         spotTakenIndex = 3;
+		thirdAvatar.src = avatarType;
     }
 
     socket.emit('spotTakenToTrue', roomsIndex, spotTakenIndex, userName, avatarType);
 });
+//avatar.src = 'avatars/7_year_old_solo_boy.png';
+//background.src = 'backgrounds/junglechat.png';
+
 
 function switchRoom(room) {
     socket.emit('switchRoom', room);

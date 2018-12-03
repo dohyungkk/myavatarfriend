@@ -10,10 +10,19 @@
     <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="styles/style.css">
 </head>
+<style>
+  html{
+   padding:50px;
+  }
+  body{
+    background-size: cover;
+  background-image: url("backgrounds/1.jpg");}
+  
+  
+ </style>
 <body>
     <div class="container">
-    <div id="messageArea" class="row">
-		<nav class="navbar navbar-expand-lg navbar-light bg-light navbar-static-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark navbar-static-top">
 			<a class="navbar-brand" href="#">MyAvatarFriend</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
@@ -32,6 +41,8 @@
 				</ul>
 			</div>
 		</nav>
+    <div id="messageArea" class="row">
+		
 		     <canvas id="myCanvas"></canvas>
 			 <div class ="modal fade" id="displayRoom" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog">

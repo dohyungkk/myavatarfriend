@@ -12,13 +12,16 @@
   html{
    padding:50px;
   }
+  body{
+    background-size: cover;
+  background-image: url("backgrounds/1.jpg");}
  </style>
 </head>
 <body>
  <div class="container">
   <div class="page-header text-center">
    <h1>My Profile</h1>
-   <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+   
   </div>
 
   <div class="row">
@@ -29,6 +32,9 @@
      <p>
       <strong>id</strong> <%= user.id %> <br>
       <strong>username</strong> <%= user.username %> <br>
+	  <br>
+	  <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+	  <a href="/logout" class="btn btn-success btn-sm">Start the Chat</a>
      </p>
     </div>
    </div>
