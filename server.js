@@ -54,7 +54,6 @@ var connections = [];
 // rooms which are currently available in chat
 var rooms = [];
 var roomCounter = 1;
-var customRooms = [];
 
 function setAvatar(gender, age) {
     if (age <= 7 && gender == 1) {
@@ -151,8 +150,6 @@ io.sockets.on('connection', function (socket) {
 				//store the index of the rooms array the client is in
 				socket.index = index;
 
-				//var numOfClients = io.sockets.adapter.rooms[rooms[index][0]];
-
 				socket.emit('drawAvatarsAlreadyInRoom', username,
 				rooms[index][1], rooms[index][2], rooms[index][3],
 				rooms[index][4], rooms[index][5], rooms[index][6],
@@ -162,9 +159,6 @@ io.sockets.on('connection', function (socket) {
 				numOfClients = io.sockets.adapter.rooms[rooms[index][0]].length;
 
 				io.in(rooms[index][0]).emit('updaterooms', rooms, rooms[index][0], numOfClients);
-				/*
-				socket.emit('updaterooms', rooms, rooms[index][0], numOfClients);
-				*/
 
 				// echo to client they've connected
 				socket.emit('updatechat', 'SERVER', 'you have connected to ' + rooms[index][0]);
@@ -240,9 +234,49 @@ io.sockets.on('connection', function (socket) {
 			}
 	});
 
-	socket.on('create', function(room) {
-      rooms.push(room);
-      io.emit('updaterooms', rooms, socket.room);
+	socket.on('createRoom', function(roomName, roomType) {
+			var background = getRoomType(roomType);
+      rooms.push([roomName, false, false, false,
+								 socket.username, null, null, socket.avatar, null, null, background]);
+
+			// leave the current room (stored in session)
+			socket.leave(socket.room);
+			// join new room, received as function parameter
+			socket.join(roomName);
+			socket.emit('updatechat', 'SERVER', 'you have connected to '+ roomName);
+			// sent message to OLD room
+			socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has left this room');
+
+			//Erase this client's avatar on everyone elses' canvas
+			socket.to(socket.room).emit('eraseAvatar', socket.position, rooms[socket.index][10]);
+
+			//Erases the client's canvas
+			socket.emit('clearCanvas');
+
+			rooms[socket.index][socket.position] = false;
+			rooms[socket.index][socket.position + 3] = null;
+
+			var roomIndex = getIndexOfRoom(roomName);
+			socket.index = roomIndex;
+
+			socket.emit('drawAvatarsAlreadyInRoom', socket.username,
+			rooms[roomIndex][1], rooms[roomIndex][2], rooms[roomIndex][3],
+			rooms[roomIndex][4], rooms[roomIndex][5], rooms[roomIndex][6],
+			rooms[roomIndex][7], rooms[roomIndex][8], rooms[roomIndex][9],
+			socket.avatar, rooms[roomIndex][10], roomIndex);
+
+			// update socket session room title
+			socket.room = roomName;
+			//socket.emit('updaterooms', rooms, roomName);
+
+			//if (io.sockets.adapter.rooms[rooms[roomIndex][0]] == undefined) {
+			//		io.sockets.adapter.rooms[rooms[roomIndex][0]] = 1;
+			//}
+
+			//var numOfClients2 = io.sockets.adapter.rooms[rooms[roomIndex][0]].length;
+			//socket.emit('updaterooms', rooms, rooms[roomIndex][0], numOfClients2);
+
+			//io.emit('updaterooms', rooms, socket.room);
   });
 
 	// when the user disconnects.. perform this
@@ -325,5 +359,30 @@ function getVacantRoomNumber() {
 				if (num != (i + 1)) {
 						return (i + 1);
 				}
+		}
+}
+
+//Returns filename of background depending on roomType
+function getRoomType(roomType) {
+		switch (roomType) {
+				case "Jungle":
+						return 'backgrounds/junglechat.png';
+						break;
+				case "Beach":
+						return 'backgrounds/beachchat.png';
+						break;
+				case "Chess":
+						return 'backgrounds/chesschat.png';
+						break;
+				case "Library":
+						return 'backgrounds/librarychat.png';
+						break;
+				case "Soccer":
+						return 'backgrounds/soccerchat.png';
+						break;
+				case "Carnival":
+						return 'backgrounds/carnivalchat.png';
+						break;
+				default:
 		}
 }

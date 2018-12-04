@@ -395,12 +395,18 @@ function send_message() {
         socket.emit('updateCanvas', message);
         socket.emit('sendchat', message);
         $('#message').val('');
-
     }
 }
 
-$('#roombutton').click(function(){
+$('#roombutton').click(function() {
    var name = $('#roomname').val();
+   var choice = document.getElementById("room_selection");
+   var roomType = choice.options[choice.selectedIndex].text;
    $('#roomname').val('');
-   socket.emit('create', name)
+   socket.emit('createRoom', name, roomType);
+   $('#createRoom').modal('hide');
 });
+
+function logout() {
+    socket.emit('disconnect');
+}

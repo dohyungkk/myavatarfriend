@@ -22,27 +22,33 @@
  </style>
 <body>
     <div class="container">
-	<nav class="navbar navbar-expand-lg navbar-dark bg-dark navbar-static-top">
-			<a class="navbar-brand" href="#">MyAvatarFriend</a>
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navbarNav">
-				<ul class="navbar-nav">
-				<li>
-					<a class="nav-link" data-toggle="modal" data-target="#displayRoom" href="#displayRoom">Room List</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="#createRoom" data-toggle="modal" data-target="#createRoom">Create a Room</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="#displayUsers" data-toggle="modal" data-target="#displayUsers">User List</a>
-				</li>
-				</ul>
-			</div>
-		</nav>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark navbar-static-top">
+              <a class="navbar-brand" href="#">MyAvatarFriend</a>
+              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarNav">
+                  <ul class="navbar-nav">
+                      <li>
+                          <a class="nav-link" data-toggle="modal" data-target="#displayRoom" href="#displayRoom">Room List</a>
+                      </li>
+                      <li class="nav-item">
+                          <a class="nav-link" href="#createRoom" data-toggle="modal" data-target="#createRoom">Create a Room</a>
+                      </li>
+                      <li class="nav-item">
+                          <a class="nav-link" href="#displayUsers" data-toggle="modal" data-target="#displayUsers">User List</a>
+                      </li>
+                  </ul>
+              </div>
+              <div class="nav navbar-nav navbar-right" id="navbarNav">
+                  <ul class="nav navbar-nav navbar-right">
+                      <li class="nav-item">
+                          <a class="btn btn-danger" href="/login" onclick="logout()">Logout</a>
+                      </li>
+                  </ul>
+              </div>
+      </nav>
     <div id="messageArea" class="row">
-
 		     <canvas id="myCanvas"></canvas>
 			 <div class ="modal fade" id="displayRoom" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog">
@@ -73,6 +79,17 @@
 								<h5>Enter room name:</h5>
 								<input class="form-control" id="roomname" style="width:200px;" />
 								</br>
+                <h5>Select room type:</h5>
+                <select id="room_selection">
+                  <option value="volvo">Jungle</option>
+                  <option value="saab">Beach</option>
+                  <option value="opel">Chess</option>
+                  <option value="audi">Library</option>
+                  <option value="opel">Soccer</option>
+                  <option value="audi">Carnival</option>
+                </select>
+                <br/>
+                <br/>
 							<input type="button" id="roombutton" value="Create Room" class="btn btn-success" />
 						</div>
 						<div class="modal-footer">
