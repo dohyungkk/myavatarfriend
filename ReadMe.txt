@@ -9,5 +9,5 @@ and have fun with the chat!
 
 
 P.S.
-or you can directly access our website from
+or you can directly access the website from
 https://myavatarfriend.herokuapp.com/

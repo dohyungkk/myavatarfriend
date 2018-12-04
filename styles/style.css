@@ -2,10 +2,13 @@
 
 body {
     margin-top:30px;
-	overflow: hidden;
+	  overflow: hidden;
 }
 
-body, html { height:100%; }
+body, html {
+    height:100%;
+}
+
 canvas {
     padding-left: 0;
     padding-right: 0;
@@ -14,9 +17,9 @@ canvas {
     display: block;
     width: 800px;
 }
-/*#messageForm {
-    padding-top: 75vh;
-}*/
+#messageForm {
+    padding-left: 150px;
+}
 
 #message {
     width: 500px;
