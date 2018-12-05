@@ -263,6 +263,7 @@ io.sockets.on('connection', function (socket) {
 			socket.join(roomName);
 
 			var roomIndex = getIndexOfRoom(roomName);
+			console.log("Create room, room index: " + roomIndex);
 			socket.index = roomIndex;
 
 			socket.emit('drawAvatarsAlreadyInRoom', socket.username,
