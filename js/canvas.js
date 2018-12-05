@@ -72,12 +72,13 @@ socket.on('drawAvatarsAlreadyInRoom', function(userName, firstSpotTaken, secondS
 	  var thirdAvatar = new Image();
 	  var background = new Image();
 
+    background.src = backgroundType;
+
     background.onload = function() {
         canvas.width = background.naturalWidth;
         canvas.height = background.naturalHeight;
         ctx.drawImage(background, 0, 0);
     }
-    background.src = backgroundType;
 
 	  firstAvatar.onload = function() {
 	  	  ctx.drawImage(firstAvatar, first_x, first_y, 80, 120);
@@ -164,7 +165,6 @@ socket.on('updatechat', function (username, data) {
 
 socket.on('drawChatBubble', function(message, userPosition, backgroundType) {
     //clearTimeout(timeOut);
-
     var x;
     var y;
     var backgroundChat = new Image();

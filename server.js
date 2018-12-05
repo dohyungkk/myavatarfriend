@@ -289,10 +289,9 @@ io.sockets.on('connection', function (socket) {
 			// echo globally that this client has left
 			socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected');
 			//Erase this client's avatar on everyone elses' canvas
-			socket.to(socket.room).emit('eraseAvatar', socket.position, rooms[socket.index][10]);
 
-			if (rooms[socket.index][socket.position] == undefined) {
-					rooms[socket.index][socket.position] = false;
+			if (!roomIsEmpty(socket.index)) {
+					socket.to(socket.room).emit('eraseAvatar', socket.position, rooms[socket.index][10]);
 			}
 
 			rooms[socket.index][socket.position] = false;
