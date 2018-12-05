@@ -89,7 +89,7 @@ socket.on('drawAvatarsAlreadyInRoom', function(userName, firstSpotTaken, secondS
             } else {
                 drawNameTag(ctx, first_x, first_y, userName);
             }
-        }, 500);
+        }, 1000);
         console.log("first avatar load");
 	  }
 
@@ -101,7 +101,7 @@ socket.on('drawAvatarsAlreadyInRoom', function(userName, firstSpotTaken, secondS
             } else {
                 drawNameTag(ctx, second_x, second_y, userName);
             }
-        }, 500);
+        }, 1000);
         console.log("second avatar load");
 	  }
 
@@ -113,7 +113,7 @@ socket.on('drawAvatarsAlreadyInRoom', function(userName, firstSpotTaken, secondS
             } else {
                 drawNameTag(ctx, third_x, third_y, userName);
             }
-        }, 500);
+        }, 1000);
         console.log("third avatar load");
 	  }
 
