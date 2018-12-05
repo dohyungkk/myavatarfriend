@@ -82,32 +82,38 @@ socket.on('drawAvatarsAlreadyInRoom', function(userName, firstSpotTaken, secondS
     }
 
 	  firstAvatar.onload = function() {
-	  	  ctx.drawImage(firstAvatar, first_x, first_y, 80, 120);
-        if (firstSpotTaken) {
-            drawNameTag(ctx, first_x, first_y, firstSpotUserName);
-        } else {
-            drawNameTag(ctx, first_x, first_y, userName);
-        }
+        setTimeout(function() {
+            ctx.drawImage(firstAvatar, first_x, first_y, 80, 120);
+            if (firstSpotTaken) {
+                drawNameTag(ctx, first_x, first_y, firstSpotUserName);
+            } else {
+                drawNameTag(ctx, first_x, first_y, userName);
+            }
+        }, 500);
         console.log("first avatar load");
 	  }
 
 	  secondAvatar.onload = function() {
-	  	  ctx.drawImage(secondAvatar, second_x, second_y, 80, 120);
-        if (secondSpotTaken) {
-            drawNameTag(ctx, second_x, second_y, secondSpotUserName);
-        } else {
-            drawNameTag(ctx, second_x, second_y, userName);
-        }
+        setTimeout(function() {
+            ctx.drawImage(secondAvatar, second_x, second_y, 80, 120);
+            if (secondSpotTaken) {
+                drawNameTag(ctx, second_x, second_y, secondSpotUserName);
+            } else {
+                drawNameTag(ctx, second_x, second_y, userName);
+            }
+        }, 500);
         console.log("second avatar load");
 	  }
 
 	  thirdAvatar.onload = function() {
-	  	  ctx.drawImage(thirdAvatar, third_x, third_y, 80, 120);
-        if (thirdSpotTaken) {
-            drawNameTag(ctx, third_x, third_y, thirdSpotUserName);
-        } else {
-            drawNameTag(ctx, third_x, third_y, userName);
-        }
+        setTimeout(function() {
+            ctx.drawImage(thirdAvatar, third_x, third_y, 80, 120);
+            if (thirdSpotTaken) {
+                drawNameTag(ctx, third_x, third_y, thirdSpotUserName);
+            } else {
+                drawNameTag(ctx, third_x, third_y, userName);
+            }
+        }, 500);
         console.log("third avatar load");
 	  }
 
