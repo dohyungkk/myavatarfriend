@@ -238,11 +238,6 @@ io.sockets.on('connection', function (socket) {
 			var background = getRoomType(roomType);
       rooms.push([roomName, false, false, false,
 								 socket.username, null, null, socket.avatar, null, null, background]);
-
-			// leave the current room (stored in session)
-			socket.leave(socket.room);
-			// join new room, received as function parameter
-			socket.join(roomName);
 			socket.emit('updatechat', 'SERVER', 'you have connected to '+ roomName);
 			// sent message to OLD room
 			socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has left this room');
@@ -255,6 +250,17 @@ io.sockets.on('connection', function (socket) {
 
 			rooms[socket.index][socket.position] = false;
 			rooms[socket.index][socket.position + 3] = null;
+
+			var room = io.sockets.adapter.rooms[rooms[socket.index][0]];
+
+			if (room.length == 1) {
+					rooms.splice(socket.index, 1);
+			}
+
+			// leave the current room (stored in session)
+			socket.leave(socket.room);
+			// join new room, received as function parameter
+			socket.join(roomName);
 
 			var roomIndex = getIndexOfRoom(roomName);
 			socket.index = roomIndex;
@@ -313,7 +319,7 @@ io.sockets.on('connection', function (socket) {
 			}
 
 			if (roomIsEmpty(socket.index)) {
-					rooms.splice(socket.index);
+					rooms.splice(socket.index, 1);
 			}
 	});
 

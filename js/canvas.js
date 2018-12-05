@@ -75,12 +75,14 @@ socket.on('drawAvatarsAlreadyInRoom', function(userName, firstSpotTaken, secondS
     background.src = backgroundType;
 
     background.onload = function() {
+        console.log("FIRST");
         canvas.width = background.naturalWidth;
         canvas.height = background.naturalHeight;
         ctx.drawImage(background, 0, 0);
     }
 
 	  firstAvatar.onload = function() {
+        console.log("SECOND");
 	  	  ctx.drawImage(firstAvatar, first_x, first_y, 80, 120);
         if (firstSpotTaken) {
             drawNameTag(ctx, first_x, first_y, firstSpotUserName);
