@@ -150,22 +150,26 @@ function switchRoom(room) {
     socket.emit('switchRoom', room);
 }
 
+socket.on('roomIsFull', function() {
+	 alert("Room is full!");
+});
+
 // listener, whenever the server emits 'updaterooms', this updates the room the client is in
-socket.on('updaterooms', function(rooms, current_room, numOfClients) {
+socket.on('updaterooms', function(rooms, current_room) {
     $('#rooms').empty();
     var i;
     for (i = 0; i < rooms.length; i++) {
         if (rooms[i][0] == current_room) {
-            $('#rooms').append('<div>' + rooms[i][0] + "\t\t" + numOfClients + "/3" + '</div>');
+            $('#rooms').append('<div>' + rooms[i][0] + '</div>');
         } else {
-            $('#rooms').append('<div><a href="#" onclick="switchRoom(\''+ rooms[i][0] +'\')">' + rooms[i][0] + "\t\t" + numOfClients + "/3" + '</a></div>');
+            $('#rooms').append('<div><a href="#" onclick="switchRoom(\''+ rooms[i][0] +'\')">' + rooms[i][0] + '</a></div>');
         }
     }
 });
 
 // listener, whenever the server emits 'updaterooms', this updates the room the client is in
-socket.on('updateRoomsForOthers', function(current_room, numOfClients) {
-    $('#rooms').append('<div><a href="#" onclick="switchRoom(\''+ current_room +'\')">' + current_room + "\t\t" + numOfClients + "/3" + '</a></div>');
+socket.on('updateRoomsForOthers', function(current_room) {
+    $('#rooms').append('<div><a href="#" onclick="switchRoom(\''+ current_room +'\')">' + current_room + '</a></div>');
 });
 
 // listener, whenever the server emits 'updatechat', this updates the chat body
@@ -372,11 +376,12 @@ function draw_bubble(ctx, color, x, y, radius, text) {
 }
 
 function drawNameTag(ctx, x, y, name) {
-  ctx.fillStyle = "#000";
   ctx.font = "bold 20px Arial";
+  ctx.fillStyle = '#ffff00';
 
 	var width = ctx.measureText(name).width;
 	var xWidth = x;
+  var nameTagHeight = 25;
 
 	if (width < 2)	{
 		  ctx.fillText(name, xWidth, y + 130);

@@ -107,8 +107,7 @@ io.sockets.on('connection', function (socket) {
 						 						username, null, null, setAvatar(gender, age), null, null, setBackground(gender, age)]);
 						socket.join(rooms[rooms.length - 1][0]);
 						index = rooms.length - 1;
-						numOfClients = io.sockets.adapter.rooms[rooms[index][0]].length;
-						socket.broadcast.emit('updateRoomsForOthers', rooms[index][0], numOfClients);
+						socket.broadcast.emit('updateRoomsForOthers', rooms[index][0]);
 				} else {
 						var roomsAllFull = true;
 						var i;
@@ -156,9 +155,7 @@ io.sockets.on('connection', function (socket) {
 				rooms[index][7], rooms[index][8], rooms[index][9],
 				setAvatar(gender, age), rooms[index][10], index);
 
-				numOfClients = io.sockets.adapter.rooms[rooms[index][0]].length;
-
-				io.in(rooms[index][0]).emit('updaterooms', rooms, rooms[index][0], numOfClients);
+				io.in(rooms[index][0]).emit('updaterooms', rooms, rooms[index][0]);
 
 				// echo to client they've connected
 				socket.emit('updatechat', 'SERVER', 'you have connected to ' + rooms[index][0]);
@@ -229,8 +226,7 @@ io.sockets.on('connection', function (socket) {
 					io.sockets.adapter.rooms[rooms[roomIndex][0]] = 1;
 				}
 
-				var numOfClients2 = io.sockets.adapter.rooms[rooms[roomIndex][0]].length;
-				socket.emit('updaterooms', rooms, rooms[roomIndex][0], numOfClients2);
+				socket.emit('updaterooms', rooms, rooms[roomIndex][0]);
 			}
 	});
 
@@ -251,9 +247,7 @@ io.sockets.on('connection', function (socket) {
 			rooms[socket.index][socket.position] = false;
 			rooms[socket.index][socket.position + 3] = null;
 
-			var room = io.sockets.adapter.rooms[rooms[socket.index][0]];
-
-			if (room.length == 1) {
+			if (roomIsEmpty(socket.index)) {
 					rooms.splice(socket.index, 1);
 			}
 
@@ -274,11 +268,10 @@ io.sockets.on('connection', function (socket) {
 
 			// update socket session room title
 			socket.room = roomName;
-			//socket.emit('updaterooms', rooms, roomName);
 
-			//if (io.sockets.adapter.rooms[rooms[roomIndex][0]] == undefined) {
-			//		io.sockets.adapter.rooms[rooms[roomIndex][0]] = 1;
-			//}
+			socket.emit('updaterooms', rooms, socket.room);
+
+			socket.broadcast.emit('updateRoomsForOthers', rooms[socket.index][0]);
 
 			//var numOfClients2 = io.sockets.adapter.rooms[rooms[roomIndex][0]].length;
 			//socket.emit('updaterooms', rooms, rooms[roomIndex][0], numOfClients2);
@@ -304,23 +297,9 @@ io.sockets.on('connection', function (socket) {
 			rooms[socket.index][socket.position] = false;
 			rooms[socket.index][socket.position + 3] = null;
 
-			if (rooms.length == 0) {
-				var index1 = rooms.length - 1;
-				numOfClients = io.sockets.adapter.rooms[rooms[index1][0]].length;
-				io.sockets.emit('updaterooms', rooms, rooms[index1][0], numOfClients);
-			} else if (rooms.length == 1) {
-				// remove user count in room (Room 1 3/3 -> Room 1 2/3)
-				var index = rooms.length - 1;
-				// code below crashes node js???
-				if (io.sockets.adapter.rooms[rooms[index][0]] == undefined) {
-					io.sockets.adapter.rooms[rooms[index][0]] = 1;
-				}
-				numOfClients = io.sockets.adapter.rooms[rooms[index][0]].length;
-				io.sockets.emit('updaterooms', rooms, rooms[index][0], numOfClients);
-			}
-
 			if (roomIsEmpty(socket.index)) {
 					rooms.splice(socket.index, 1);
+					io.sockets.emit('updaterooms', rooms, rooms[socket.index][0]);
 			}
 	});
 
@@ -342,6 +321,17 @@ io.sockets.on('connection', function (socket) {
 function roomIsEmpty(i) {
 		for (var j = 4; j <= 6; j++) {
 				if (rooms[i][j] != null) {
+						return false;
+				}
+		}
+
+		return true;
+}
+
+//Checks to see if all 3 usernames in the room are not null and if they all are it returns true
+function roomIsFull(i) {
+		for (var j = 4; j <= 6; j++) {
+				if (rooms[i][j] == null) {
 						return false;
 				}
 		}
