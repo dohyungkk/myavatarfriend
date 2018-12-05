@@ -168,6 +168,7 @@ socket.on('drawChatBubble', function(message, userPosition, backgroundType) {
     var x;
     var y;
     var backgroundChat = new Image();
+    ctx.clearRect(x - 147, y - 169, 260, 170);
     backgroundChat.src = backgroundType;
 
     if (userPosition == 1) {
@@ -181,7 +182,6 @@ socket.on('drawChatBubble', function(message, userPosition, backgroundType) {
         y = 210;
     }
 
-    ctx.clearRect(x - 147, y - 169, 260, 170);
     ctx.drawImage(backgroundChat, x - 147, y - 169, 260, 170, x - 147, y - 169, 260, 170);
     draw_bubble(ctx, "#fff", x , y, 10, message);
     clearChatBubble(x, y, backgroundChat);
