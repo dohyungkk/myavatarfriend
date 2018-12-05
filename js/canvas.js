@@ -17,7 +17,7 @@ window.onload = function() {
     canvas.height = _background.naturalHeight;
     ctx.drawImage(_background, 0, 0);
     socket.emit('adduser', userName.textContent, gender.textContent, calculateAge(new Date(birthDate.textContent)));
-    socket.emit('new user', userName.textContent);
+    socket.emit('addToUserArray', userName.textContent);
 }
 
 socket.on('drawAvatar', function(userName, roomsIndex, firstSpotTaken, secondSpotTaken, thirdSpotTaken, avatarType) {
@@ -160,16 +160,27 @@ socket.on('updaterooms', function(rooms, current_room) {
     var i;
     for (i = 0; i < rooms.length; i++) {
         if (rooms[i][0] == current_room) {
-            $('#rooms').append('<div>' + rooms[i][0] + '</div>');
+            $('#rooms').append('<li>' + rooms[i][0] + '</li>');
         } else {
-            $('#rooms').append('<div><a href="#" onclick="switchRoom(\''+ rooms[i][0] +'\')">' + rooms[i][0] + '</a></div>');
+            $('#rooms').append('<li><a href="#" onclick="switchRoom(\''+ rooms[i][0] +'\')">' + rooms[i][0] + '</a></li>');
+        }
+    }
+});
+
+socket.on('updateWithDeletedRoom', function(rooms, deletedRoomName) {
+    var ul = document.getElementById("rooms");
+    var items = ul.getElementsByTagName("li");
+    for (var i = 0; i < items.length; i++) {
+        if (items[i].innerText == deletedRoomName) {
+            ul.removeChild(ul.children[i]);
+            break;
         }
     }
 });
 
 // listener, whenever the server emits 'updaterooms', this updates the room the client is in
 socket.on('updateRoomsForOthers', function(current_room) {
-    $('#rooms').append('<div><a href="#" onclick="switchRoom(\''+ current_room +'\')">' + current_room + '</a></div>');
+    $('#rooms').append('<li><a href="#" onclick="switchRoom(\''+ current_room +'\')">' + current_room + '</a></li>');
 });
 
 // listener, whenever the server emits 'updatechat', this updates the chat body
@@ -250,7 +261,7 @@ canvas.addEventListener('click', function(evt) {
   console.log(message);
 }, false);
 
-socket.on('get users', function(data) {
+socket.on('updateUsers', function(data) {
     var html = '';
     for (i = 0; i < data.length; i++) {
         html += '<li class="list-group-item">' + data[i] + '</li>';

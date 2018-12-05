@@ -204,6 +204,11 @@ io.sockets.on('connection', function (socket) {
 				rooms[socket.index][socket.position] = false;
 				rooms[socket.index][socket.position + 3] = null;
 
+				if (roomIsEmpty(socket.index)) {
+						rooms.splice(socket.index, 1);
+						updateWithDeletedRoom();
+				}
+
 				var roomIndex = getIndexOfRoom(newroom);
 				socket.index = roomIndex;
 
@@ -249,6 +254,7 @@ io.sockets.on('connection', function (socket) {
 
 			if (roomIsEmpty(socket.index)) {
 					rooms.splice(socket.index, 1);
+					updateWithDeletedRoom();
 			}
 
 			// leave the current room (stored in session)
@@ -257,7 +263,6 @@ io.sockets.on('connection', function (socket) {
 			socket.join(roomName);
 
 			var roomIndex = getIndexOfRoom(roomName);
-			console.log("Create room, room index: " + roomIndex);
 			socket.index = roomIndex;
 
 			socket.emit('drawAvatarsAlreadyInRoom', socket.username,
@@ -299,21 +304,25 @@ io.sockets.on('connection', function (socket) {
 
 			if (roomIsEmpty(socket.index)) {
 					rooms.splice(socket.index, 1);
-					io.sockets.emit('updaterooms', rooms, rooms[socket.index][0]);
+					updateWithDeletedRoom();
 			}
 	});
 
 	connections.push(socket);
 	console.log('Connected: %s sockets connected', connections.length);
 
-	socket.on('new user', function(username) {
+	socket.on('addToUserArray', function(username) {
 			socket.username = username;
 			users.push(socket.username);
 			updateUsernames();
 	});
 
-	function updateUsernames(){
-			io.sockets.emit('get users', users);
+	function updateUsernames() {
+			io.sockets.emit('updateUsers', users);
+	}
+
+	function updateWithDeletedRoom() {
+			socket.broadcast.emit('updateWithDeletedRoom', rooms, socket.room);
 	}
 });
 
