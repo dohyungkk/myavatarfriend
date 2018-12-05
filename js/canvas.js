@@ -75,20 +75,20 @@ socket.on('drawAvatarsAlreadyInRoom', function(userName, firstSpotTaken, secondS
     background.src = backgroundType;
 
     background.onload = function() {
-        console.log("FIRST");
         canvas.width = background.naturalWidth;
         canvas.height = background.naturalHeight;
         ctx.drawImage(background, 0, 0);
+        console.log("Background load");
     }
 
 	  firstAvatar.onload = function() {
-        console.log("SECOND");
 	  	  ctx.drawImage(firstAvatar, first_x, first_y, 80, 120);
         if (firstSpotTaken) {
             drawNameTag(ctx, first_x, first_y, firstSpotUserName);
         } else {
             drawNameTag(ctx, first_x, first_y, userName);
         }
+        console.log("first avatar load");
 	  }
 
 	  secondAvatar.onload = function() {
@@ -98,6 +98,7 @@ socket.on('drawAvatarsAlreadyInRoom', function(userName, firstSpotTaken, secondS
         } else {
             drawNameTag(ctx, second_x, second_y, userName);
         }
+        console.log("second avatar load");
 	  }
 
 	  thirdAvatar.onload = function() {
@@ -107,6 +108,7 @@ socket.on('drawAvatarsAlreadyInRoom', function(userName, firstSpotTaken, secondS
         } else {
             drawNameTag(ctx, third_x, third_y, userName);
         }
+        console.log("third avatar load");
 	  }
 
     if (firstSpotTaken) {
