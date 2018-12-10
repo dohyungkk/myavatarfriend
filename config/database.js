@@ -1,9 +1,9 @@
 module.exports = {
  'connection':{
   'host':'us-cdbr-iron-east-01.cleardb.net',
-  'user':'b63b6a7142f01d',
-  'password':'c8f37c24'
+  'user':'b455e0446cea14',
+  'password':'b07a0dd0'
  },
- 'database':'heroku_720a9e0e0ecdd3d',
+ 'database':'heroku_09e897b20363e23',
  'user_table':'users'
 }
