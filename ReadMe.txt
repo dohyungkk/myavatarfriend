@@ -1,4 +1,4 @@
-To start, open cmd in this folder and type "npm start"
+To start, open cmd in this folder and type "npm install" and then "npm start"
 
 In order to register, both username and password have to be filled.
 
